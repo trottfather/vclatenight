@@ -24,7 +24,6 @@ brand/social-avatars/ profile pictures for X, Instagram, TikTok, YouTube, Linked
 - **Display type:** big titles use Oswald SemiBold, slanted, to match the logo. Body text uses the system sans.
 
 ## Before launch: fill these in
-- [ ] **LinkedIn**: add it to the footer social list in `index.html` when Alex sends the URL.
 - [ ] Have someone review the Privacy and Terms text. These are standard templates, not legal advice.
 
 ## Redirects: righttoinvest.com → vclatenight.com (set up at the DNS/CDN, not in this repo)
