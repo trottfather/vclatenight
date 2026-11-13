@@ -4,16 +4,18 @@ This is the static site for VC Late Night (formerly Right To Invest). It has no 
 
 ```
 index.html            homepage
+archive.html          Season One archive (episodes, matchups, contestants, experts)
 privacy.html          Privacy Policy
 terms.html            Terms of Use
 favicon.ico/.svg      favicons (VC mark), apple-touch-icon.png, icon-192/512.png
 site.webmanifest      app icons for Android/Chrome
 robots.txt, sitemap.xml
-_redirects            same-site redirects (Cloudflare Pages / Netlify syntax)
 assets/css, assets/js
 assets/fonts/         Oswald (the logo typeface), subset to woff2, SIL OFL licence
 assets/images/        logo.svg (white, for dark bg), logo-dark.svg (black, for light bg),
                       og-image.jpg (1200x630 share image), photos and thumbnails
+assets/images/archive/, assets/images/people/   archive thumbnails and headshots
+brand/social-avatars/ profile pictures for X, Instagram, TikTok, YouTube, LinkedIn
 ```
 
 ## Brand
@@ -24,9 +26,6 @@ assets/images/        logo.svg (white, for dark bg), logo-dark.svg (black, for l
 ## Before launch: fill these in
 - [ ] **Contact email** in `privacy.html` and `terms.html`: replace `[CONTACT EMAIL]` (2 places each).
 - [ ] **LinkedIn**: add it to the footer social list in `index.html` when Alex sends the URL.
-- [ ] **Archive page**: the old `archive.html` (Season One matchups and contestants) wasn't in the handoff files. Until it's added:
-  - archive links point to the history band on the homepage (`/#archive`) and to YouTube.
-  - `_redirects` sends `/archive.html` to `/#archive`. Delete that line when the page is added.
 - [ ] Have someone review the Privacy and Terms text. These are standard templates, not legal advice.
 
 ## Redirects: righttoinvest.com → vclatenight.com (set up at the DNS/CDN, not in this repo)
@@ -36,7 +35,18 @@ Add one permanent (301) rule on the **righttoinvest.com** zone that keeps the pa
 |---|---|
 | `http(s)://righttoinvest.com/*` and `http(s)://www.righttoinvest.com/*` | `https://vclatenight.com/${path}` (301, keep the query string) |
 
-`/archive.html` then follows the same-site rule in `_redirects`. Also redirect `www.vclatenight.com` to `https://vclatenight.com` (canonical URLs use the bare domain). Keep righttoinvest.com registered.
+The old archive lived at `/archive` (and was linked as `/archive.html`). Both paths exist on vclatenight.com: Cloudflare Pages and Netlify serve `archive.html` at `/archive` too. Also redirect `www.vclatenight.com` to `https://vclatenight.com` (canonical URLs use the bare domain). Keep righttoinvest.com registered.
+
+## Social profile pictures
+`brand/social-avatars/` holds the full logo on black, sized so it sits inside the circle crop every platform applies.
+
+| File | Use for |
+|---|---|
+| `vclatenight-avatar-1080.png` | Instagram, TikTok, Facebook (upload the large one; they downscale) |
+| `vclatenight-avatar-800.png` | YouTube |
+| `vclatenight-avatar-400.png` | X, LinkedIn |
+
+`preview.png` shows the circle crop and the small feed sizes.
 
 ## Newsletter
 Both Subscribe buttons (header and bottom section) link to `https://vclatenight.substack.com/subscribe`. To embed the signup form on the page instead, replace the `.signup-form` block in `index.html` with:
