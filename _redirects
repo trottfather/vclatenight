@@ -1,0 +1,5 @@
+# Same-site redirects (Cloudflare Pages / Netlify format).
+# The old site's archive page has no VC Late Night equivalent yet, so old
+# links to it land on the homepage's history section. Delete this line once
+# archive.html is added to the repo.
+/archive.html  /#archive  301

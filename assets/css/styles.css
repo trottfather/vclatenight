@@ -1,0 +1,735 @@
+/* ============================================================
+   VC LATE NIGHT
+   Palette and display face come from the VC Late Night logo files:
+   near-black ink, white type, one blue (#2088D7, the logo's bar).
+
+   Designing against the conventions of a streaming front page rather than a
+   marketing site: one title owns the viewport, actions are play-first, content
+   is browsed in horizontal rows, chrome disappears until you need it, and type
+   labels things instead of explaining them. Company information exists, but it
+   lives below the content and speaks quietly.
+   ============================================================ */
+
+:root {
+  --ink: #08080a;
+  --ink-2: #0e0e11;
+  --paper: #ffffff;
+  --dim: rgba(255, 255, 255, 0.62);
+  --dimmer: rgba(255, 255, 255, 0.42);
+  --line: rgba(255, 255, 255, 0.1);
+  /* Logo blue. Used for rules, marks and large text on ink (5.3:1). Filled
+     buttons carrying white text use the deeper shade, which clears 4.5:1. */
+  --accent: #2088d7;
+  --accent-deep: #1b74b8;
+  --shell: clamp(20px, 4vw, 60px);
+  /* One content well for the whole page. Everything — bar, billboard, rows,
+     and every section below them — uses --gutter for its horizontal padding,
+     so every left edge lines up at every viewport. Previously the rows sat on
+     a --shell gutter while the lower sections centred a 1240px column inside
+     it, which put their left edges ~42px apart at desktop widths. */
+  --well: 1560px;
+  --gutter: max(var(--shell), calc((100% - var(--well)) / 2));
+  --font: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+  /* The logo is set in Oswald, slanted. Used only for the big display titles. */
+  --display: "Oswald", "Arial Narrow", Impact, sans-serif;
+}
+
+@font-face {
+  font-family: "Oswald";
+  src: url("../fonts/oswald-var.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+::selection { background: var(--accent); color: var(--paper); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+/* --- Chrome ------------------------------------------------------------ */
+.bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 7px var(--gutter);
+  transition: background 0.35s ease, padding 0.3s ease;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+  transition: background 0.35s ease, backdrop-filter 0.35s ease;
+}
+.bar--solid {
+  padding-block: 7px;
+  background: rgba(8, 8, 10, 0.86);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+/* Full size over the billboard, smaller once the bar solidifies. The mark is
+   a two-line lockup, so it's sized by height — sizing by width rendered it
+   76px tall on a phone and gave the bar a 112px header. */
+/* The mark is a stacked two-line lockup (200x180), so its height drives the
+   bar height directly — every pixel of logo is a pixel of chrome. Padding is
+   pulled right in so the logo can be big without the bar following it, and it
+   steps down once the bar solidifies. */
+.bar-logo img {
+  height: clamp(42px, 3.8vw, 60px);
+  width: auto;
+  transition: height 0.3s ease;
+}
+.bar--solid .bar-logo img { height: clamp(32px, 2.5vw, 40px); }
+.bar-nav {
+  display: flex;
+  gap: clamp(18px, 2.4vw, 34px);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--dim);
+}
+.bar-nav a:hover { color: var(--paper); }
+@media (max-width: 720px) { .bar-nav { display: none; } }
+
+.bar-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--accent-deep);
+  color: var(--paper);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bar-cta:hover { opacity: 0.85; }
+
+/* --- Hero: one title owns the viewport --------------------------------- */
+.billboard {
+  position: relative;
+  min-height: min(88vh, 860px);
+  display: flex;
+  align-items: flex-end;
+  isolation: isolate;
+  overflow: hidden;
+}
+.billboard-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.billboard-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* YouTube pads posters to 16:9 and bakes the bars in, so the still is
+     scaled past them. Anchored to the top because both faces sit within a few
+     percent of the frame's top edge — scaling from the centre took the crop
+     off the top and cut heads off. Origin top sends all of it downward. */
+  transform: scale(1.12);
+  transform-origin: center top;
+}
+/* Two scrims, not one: a vertical lift so the title has ground, and a
+   horizontal one so it has ground at wide viewports where the art is mostly
+   to the right of the copy. */
+.billboard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, var(--ink) 2%, rgba(8,8,10,0.55) 38%, transparent 72%),
+    linear-gradient(to right, rgba(8,8,10,0.88) 0%, rgba(8,8,10,0.35) 46%, transparent 78%);
+}
+@media (max-width: 760px) {
+  .billboard-art img { object-position: 32% center; }
+  /* Taller on phones than on desktop, proportionally. The copy block is a
+     fixed height but the viewport isn't, so at 76vh the headline, meta, deck
+     and buttons were eating most of the visible frame. The extra height all
+     goes above the copy, since the copy is anchored off the bottom. */
+  .billboard { min-height: min(92vh, 820px); }
+}
+
+.billboard-inner {
+  position: relative;
+  width: 100%;
+  /* Deep bottom padding on purpose. The first row is pulled up into the
+     billboard so the page reads as continuous rather than stacked, and
+     without this the row lands on top of the Play button. */
+  padding: 0 var(--gutter) clamp(132px, 19vh, 210px);
+  max-width: 780px;
+}
+.billboard-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  margin-bottom: 18px;
+}
+.billboard-eyebrow::before {
+  content: '';
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+}
+.billboard-title {
+  font-family: var(--display);
+  font-size: clamp(3rem, 8.4vw, 6.2rem);
+  font-weight: 600;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+}
+.billboard-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 0.86rem;
+  color: var(--dim);
+}
+.billboard-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--dimmer); }
+.billboard-sub {
+  margin-top: 14px;
+  max-width: 54ch;
+  font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--dim);
+}
+.billboard-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 0;
+  font-family: inherit;
+  transition: opacity 0.25s ease, background 0.25s ease;
+}
+.btn--play { background: var(--paper); color: var(--ink); }
+.btn--play:hover { opacity: 0.82; }
+.btn--ghost { background: rgba(255,255,255,0.14); color: var(--paper); backdrop-filter: blur(6px); }
+.btn--ghost:hover { background: rgba(255,255,255,0.24); }
+.btn svg { width: 17px; height: 17px; }
+
+/* --- Rows -------------------------------------------------------------- */
+.rows { position: relative; z-index: 2; margin-top: clamp(-104px, -7vw, -56px); padding-bottom: clamp(16px, 2vw, 30px); }
+
+.row { margin-bottom: clamp(30px, 4vw, 52px); }
+.row-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 0 var(--gutter);
+  margin-bottom: 14px;
+}
+.row-title { font-size: clamp(1.05rem, 1.5vw, 1.35rem); font-weight: 700; letter-spacing: -0.015em; }
+.row-note { font-size: 0.82rem; color: var(--dimmer); }
+
+/* Horizontal scroller with snap — the row is browsed, not paginated. */
+.row-track {
+  display: flex;
+  gap: clamp(10px, 1vw, 16px);
+  padding: 4px var(--gutter) 18px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  /* Without this the first card sits flush against the viewport edge. Snap
+     aligns a card's start edge to the scrollport's start, which is inside the
+     padding — so the track silently scrolls past its own padding-left on load.
+     scroll-padding moves the snap line to where the padding actually is. */
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+.row-track::-webkit-scrollbar { display: none; }
+
+.card {
+  position: relative;
+  flex: 0 0 clamp(232px, 25vw, 348px);
+  scroll-snap-align: start;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ink-2);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.card-art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+.card-art img { width: 100%; height: 100%; object-fit: cover; }
+/* YouTube pads a poster to 16:9 when the source isn't, and bakes the bars into
+   the JPEG, where object-fit can't reach them. Only the videos that actually
+   have them get scaled — applying it to all of them crops the clean ones. */
+.card[data-pillarbox] .card-art img { transform: scale(1.12); }
+.card::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 62%;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.card-body { position: absolute; inset: auto 0 0 0; padding: 14px 15px; z-index: 1; }
+.card-kicker {
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--dimmer);
+}
+.card-name { margin-top: 5px; font-size: 0.98rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+
+/* Hover lifts the card and reveals a play badge — the streaming-row idiom. */
+.card-play {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.85);
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 2;
+}
+.card-play::before {
+  content: '';
+  position: absolute; top: 50%; left: 54%;
+  transform: translate(-50%, -50%);
+  border: solid transparent;
+  border-width: 8px 0 8px 13px;
+  border-left-color: var(--paper);
+}
+@media (hover: hover) {
+  .card:hover { transform: translateY(-4px) scale(1.025); z-index: 3; }
+  .card:hover .card-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.card:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+
+.card--pending { cursor: default; }
+.card--pending .card-art {
+  background: linear-gradient(150deg, #121214, #111620 60%, #0f1b2a);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.card--pending .card-art::after {
+  content: 'Coming soon';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.64rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.24);
+}
+
+/* Player replaces the art in place. */
+.frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; z-index: 4; }
+
+/* --- Information, below the content ------------------------------------ */
+.info { border-top: 1px solid var(--line); padding: clamp(56px, 8vw, 104px) var(--gutter); }
+.info-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 76px);
+  align-items: center;
+}
+@media (max-width: 820px) { .info-grid { grid-template-columns: 1fr; } }
+.info-shot img { width: 100%; border-radius: 10px; }
+.info-cap { margin-top: 12px; font-size: 0.82rem; color: var(--dimmer); }
+.info-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--dimmer);
+}
+.info-head {
+  margin-top: 14px;
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  font-weight: 800; line-height: 1.12; letter-spacing: -0.025em;
+}
+.info-body { margin-top: 16px; font-size: 1rem; line-height: 1.65; color: var(--dim); max-width: 52ch; }
+.info-body + .info-body { margin-top: 12px; }
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding: clamp(40px, 5vw, 64px) var(--gutter) 28px;
+  font-size: 0.88rem;
+  color: var(--dim);
+}
+.foot-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: clamp(28px, 5vw, 72px);
+}
+@media (max-width: 820px) { .foot-top { grid-template-columns: 1fr; gap: 34px; } }
+.foot-logo { width: 132px; height: auto; }
+.foot-tagline { margin-top: 14px; max-width: 34ch; color: var(--dim); line-height: 1.55; }
+.foot-social { list-style: none; display: flex; gap: 16px; margin-top: 18px; }
+.foot-social a { color: var(--dimmer); }
+.foot-social a:hover { color: var(--paper); }
+
+.foot-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 44px);
+}
+@media (max-width: 560px) { .foot-cols { grid-template-columns: 1fr 1fr; } }
+.foot-cols h4 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--paper);
+  margin-bottom: 12px;
+}
+.foot-cols a { display: block; margin-bottom: 9px; color: var(--dimmer); font-size: 0.88rem; }
+.foot-cols a:hover { color: var(--paper); }
+
+.foot-bottom {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px;
+  margin-top: clamp(32px, 4vw, 52px);
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--dimmer);
+}
+.foot-legal { display: flex; gap: 18px; }
+.foot-legal a:hover { color: var(--paper); }
+
+/* --- Contact: the three doors, numbered as the current site has them ---- */
+.strip { border-top: 1px solid var(--line); padding: clamp(52px, 7vw, 92px) var(--gutter); }
+.strip-lead { margin-bottom: clamp(28px, 4vw, 48px); }
+.strip-head {
+  margin-top: 12px;
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -0.025em;
+}
+.strip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(26px, 4vw, 58px);
+}
+@media (max-width: 820px) { .strip-grid { grid-template-columns: 1fr; } }
+.strip-num {
+  display: block;
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.16em; color: var(--accent);
+  margin-bottom: 10px;
+}
+.strip-item h3 { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.012em; }
+.strip-item p { margin-top: 9px; font-size: 0.94rem; line-height: 1.6; color: var(--dim); }
+.lnk {
+  display: inline-block; margin-top: 14px;
+  font-size: 0.88rem; font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px;
+}
+.lnk:hover { border-bottom-color: var(--paper); }
+.strip-status { display: block; font-size: 0.82rem; color: var(--dimmer); }
+
+/* --- Live: the one section about a thing you attend, so it gets the
+       taping photograph rather than another row of small text. Same
+       vocabulary as the billboard — full-bleed image, two-direction scrim,
+       type over it — at a smaller scale. ------------------------------- */
+.live-band {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  padding: clamp(74px, 11vw, 148px) var(--gutter);
+}
+.live-art { position: absolute; inset: 0; z-index: -2; }
+.live-art img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+.live-band::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(to right, rgba(8,8,10,0.94) 0%, rgba(8,8,10,0.72) 42%, rgba(8,8,10,0.32) 78%),
+    linear-gradient(to top, var(--ink) 0%, transparent 46%);
+}
+.live-inner { max-width: 620px; }
+.live-copy { margin-top: 14px; max-width: 46ch; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.82); }
+.live-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 22px; }
+.live-actions .strip-status { display: inline; }
+.live-actions .lnk { margin-top: 0; }
+
+/* --- Archive band: one wide target, as the current site has it --------- */
+.archive-band {
+  display: flex; flex-wrap: wrap; align-items: center; gap: clamp(14px, 2.4vw, 34px);
+  border-top: 1px solid var(--line);
+  padding: clamp(30px, 4vw, 48px) var(--gutter);
+  transition: background 0.3s ease;
+}
+.archive-band:hover { background: rgba(255,255,255,0.03); }
+.archive-copy { flex: 1 1 340px; font-size: 0.96rem; line-height: 1.55; color: var(--dim); max-width: 62ch; }
+.archive-cta { font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
+
+/* --- Newsletter -------------------------------------------------------- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.signup { border-top: 1px solid var(--line); padding: clamp(48px, 7vw, 88px) var(--gutter); }
+.signup-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: center;
+}
+@media (max-width: 820px) { .signup-grid { grid-template-columns: 1fr; gap: 20px; } }
+.signup-head {
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -0.025em;
+}
+.signup-copy { font-size: 0.98rem; line-height: 1.6; color: var(--dim); max-width: 52ch; }
+.signup-form { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.signup-form input {
+  flex: 1 1 260px;
+  padding: 13px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--paper);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.signup-form input::placeholder { color: var(--dimmer); }
+.signup-form input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Manifesto: the thesis, at the scale it carries on the current site.
+       It was a paragraph inside About, which is where it lost its weight. --- */
+.manifesto {
+  border-top: 1px solid var(--line);
+  padding: clamp(72px, 10vw, 132px) var(--gutter);
+}
+.manifesto-body {
+  max-width: 20ch;
+  font-size: clamp(1.7rem, 4.4vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 26ch;
+}
+.manifesto-turn { color: var(--accent); display: block; margin-top: 0.35em; }
+
+/* Contact doors carry visible numerals and a rule, so the three read as a
+   deliberate set rather than three stacked paragraphs. */
+.strip-item { border-top: 1px solid var(--line); padding-top: 20px; }
+.strip-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: 14px;
+}
+.strip-item h3 { font-size: 1.22rem; }
+.strip-item p { font-size: 0.96rem; }
+
+/* The portrait carries the About block, so let it fill its column. */
+.info-shot img { width: 100%; }
+.info-head { font-size: clamp(1.7rem, 3vw, 2.6rem); }
+
+/* --- Full-screen player ------------------------------------------------ */
+.player {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 56px);
+  background: rgba(3, 3, 4, 0.985);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.player[hidden] { display: none; }
+.player-box { width: 100%; max-width: 1180px; }
+.player-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+/* Shorts are 9:16. Letterboxing them into a 16:9 frame wastes most of the
+   screen, so they get a portrait stage capped to the viewport height. */
+.player-stage--portrait {
+  aspect-ratio: 9 / 16;
+  max-height: 82vh;
+  width: auto;
+  margin: 0 auto;
+}
+.player-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.player-title {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dim);
+}
+.player-close {
+  position: absolute;
+  top: clamp(12px, 2vw, 24px);
+  right: clamp(12px, 2vw, 24px);
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  color: var(--paper);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.player-close:hover { background: rgba(255,255,255,0.18); }
+
+/* The tile is a control that opens the player, so the badge stays a cue —
+   it no longer implies the video runs inside the card. */
+
+/* ============================================================
+   INTERIOR PAGES
+   Same bar, same gutter, same .row/.card as the homepage. What's added here
+   is only what the homepage has no equivalent of — a page head in place of the
+   billboard, the matchup panels, and one people grid used by both rosters.
+   ============================================================ */
+
+/* Interior pages have no billboard for the bar to float over, so the bar needs
+   its solid state from the start and the content needs to clear it. */
+.is-interior .bar { background: rgba(8,8,10,0.9); backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line); }
+.pagehead { padding: clamp(104px, 13vw, 168px) var(--gutter) clamp(28px, 4vw, 44px); }
+.pagehead-title {
+  margin-top: 14px;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  font-weight: 600; font-style: italic; text-transform: uppercase;
+  line-height: 0.96; letter-spacing: -0.005em;
+}
+.pagehead-deck { margin-top: 16px; max-width: 58ch; font-size: 1rem; line-height: 1.6; color: var(--dim); }
+
+/* --- Matchups ---------------------------------------------------------- */
+.mu-section { border-top: 1px solid var(--line); padding: clamp(52px, 7vw, 92px) var(--gutter); }
+.mu-lead { margin-bottom: clamp(28px, 4vw, 48px); }
+.mu-deck { margin-top: 14px; max-width: 62ch; font-size: 0.98rem; line-height: 1.6; color: var(--dim); }
+.mu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: clamp(16px, 2vw, 26px);
+}
+.mu {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink-2);
+  overflow: hidden;
+}
+.mu-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.mu-ep { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); }
+.mu-cat { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dimmer); }
+.mu-body { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 18px; padding: 18px; }
+@media (max-width: 520px) { .mu-body { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; } }
+.mu-shot {
+  aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+  display: grid; grid-template-columns: 1fr; background: #0a111b;
+}
+.mu-shot--duo { grid-template-columns: 1fr 1fr; }
+.mu-shot img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(1.05); }
+.mu:hover .mu-shot img { filter: grayscale(0%); }
+.mu-shot--ini {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.7rem; font-weight: 800; color: rgba(255,255,255,0.3);
+}
+.mu-title { font-size: 1.12rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; }
+.mu-founder { margin-top: 10px; }
+.mu-founder b, .mu-win b, .mu-others b { display: block; font-size: 0.9rem; font-weight: 700; }
+.mu-founder i, .mu-win i, .mu-others i { display: block; font-style: normal; font-size: 0.8rem; color: var(--dimmer); margin-top: 2px; }
+.mu-quote { margin-top: 10px; font-size: 0.86rem; line-height: 1.5; color: var(--dim); font-style: italic; }
+.mu-result { padding: 14px 18px; border-top: 1px solid var(--line); }
+.mu-lbl { display: block; font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--dimmer); margin-bottom: 10px; }
+.mu-win { display: flex; align-items: center; gap: 10px; }
+.mu-others { list-style: none; display: flex; flex-wrap: wrap; gap: 14px 22px; }
+.mu-others li { display: flex; align-items: center; gap: 9px; }
+.mu-face {
+  width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+  background: rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+}
+.mu-face img { width: 100%; height: 100%; object-fit: cover; }
+.mu-face--ini { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.45); }
+
+/* --- People grid: one component, used by contestants and experts both --- */
+.people-section { border-top: 1px solid var(--line); padding: clamp(52px, 7vw, 92px) var(--gutter); }
+.people-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: clamp(16px, 2vw, 28px);
+}
+.person { display: flex; align-items: center; gap: 14px; }
+.person-face {
+  width: 62px; height: 62px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+  background: rgba(255,255,255,0.07);
+}
+.person-face img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: filter 0.4s ease; }
+.person:hover .person-face img { filter: grayscale(0%); }
+.person-info b { display: block; font-size: 0.96rem; font-weight: 700; }
+.person-info i { display: block; font-style: normal; font-size: 0.82rem; color: var(--dim); margin-top: 3px; }
+.person-info em { display: block; font-style: normal; font-size: 0.82rem; color: var(--dimmer); }
+
+/* The line under the hosts' portrait is the show's own tagline, not a photo
+   credit — it carries at statement weight rather than caption weight. */
+.info-cap {
+  margin-top: 18px;
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--paper);
+  max-width: 26ch;
+}
+
+/* The newsletter button is the one filled-blue action below the fold. */
+.signup-form .btn--play { background: var(--accent-deep); color: var(--paper); }
+
+/* --- Legal pages ------------------------------------------------------- */
+.legal { padding: 0 var(--gutter) clamp(56px, 8vw, 104px); }
+.legal-body { max-width: 68ch; color: var(--dim); font-size: 0.98rem; line-height: 1.7; }
+.legal-body h2 {
+  margin: 2.2em 0 0.6em;
+  color: var(--paper);
+  font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em;
+}
+.legal-body p + p, .legal-body ul + p, .legal-body p + ul { margin-top: 0.9em; }
+.legal-body ul { padding-left: 1.2em; }
+.legal-body li + li { margin-top: 0.4em; }
+.legal-body a { color: var(--paper); border-bottom: 1px solid rgba(255,255,255,0.3); }
+.legal-body a:hover { border-bottom-color: var(--paper); }
