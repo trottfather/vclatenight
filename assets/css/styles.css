@@ -143,6 +143,18 @@ a { color: inherit; text-decoration: none; }
   transform: scale(1.12);
   transform-origin: center top;
 }
+/* Photo heroes (not a YouTube frame) have no baked-in bars to crop away, so
+   they skip the zoom. The hosts sit left of centre and the warm stage light
+   sits right of it; the copy goes over the dark left side. */
+.billboard-art--photo img { transform: none; object-position: 62% 40%; }
+.billboard--photo::before {
+  background:
+    linear-gradient(to top, var(--ink) 2%, rgba(8,8,10,0.4) 30%, transparent 62%),
+    linear-gradient(to right, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.3) 42%, transparent 70%);
+}
+.billboard--photo .billboard-inner { max-width: 1000px; }
+.billboard-title--tag { font-size: clamp(2.3rem, 5vw, 4.4rem); white-space: nowrap; }
+
 /* Two scrims, not one: a vertical lift so the title has ground, and a
    horizontal one so it has ground at wide viewports where the art is mostly
    to the right of the copy. */
@@ -157,6 +169,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 760px) {
   .billboard-art img { object-position: 32% center; }
+  .billboard-art--photo img { object-position: 46% 40%; }
   /* Taller on phones than on desktop, proportionally. The copy block is a
      fixed height but the viewport isn't, so at 76vh the headline, meta, deck
      and buttons were eating most of the visible frame. The extra height all
