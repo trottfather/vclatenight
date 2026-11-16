@@ -765,3 +765,11 @@ a { color: inherit; text-decoration: none; }
 .live-sched span { font-size: 1.05rem; font-weight: 700; color: var(--paper); }
 .live-sched em { font-style: normal; font-weight: 500; color: rgba(255,255,255,0.7); }
 .live-actions { margin-top: 26px; }
+
+/* Thumbnails that already carry the show title in the picture: keep the
+   caption for screen readers but don't draw it on top of the artwork. */
+.card--titled::after { display: none; }
+.card--titled .card-body {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
